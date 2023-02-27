@@ -1,16 +1,12 @@
 package frc.robot;
 
-import java.util.concurrent.locks.ReentrantLock;
-
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
-
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.XboxController;
 import frc.lib.util.ClawUtils;
 import frc.robot.Constants.Clawstants;
 
@@ -19,12 +15,8 @@ public class Arm {
     private WPI_TalonFX m_armMotorRight;
 
     private double armAngleInEncoderUnits = 0;
-    private double armAngleInDegrees = 0;
 
     private static Arm singleton;
-
-    private XboxController xbox = new XboxController(3);
-
     private DigitalInput resetEncoder = new DigitalInput(0);
 
     /*
@@ -63,32 +55,27 @@ public class Arm {
         }
         
         return singleton;
-        
     }
 
     public boolean isResetEncoderPushed(){
         return !resetEncoder.get();
     }
 
-
     public void setAngle(double armAngle){
-        armAngleInDegrees = armAngle;
         armAngleInEncoderUnits = ClawUtils.degreesToEncoderUnits(armAngle, Clawstants.armGearRatio);
 
         
         m_armMotorLeft.set( 
-        ControlMode.MotionMagic,
-        armAngleInEncoderUnits,
-        DemandType.ArbitraryFeedForward,
-        Clawstants.armFeedForward * java.lang.Math
-             .cos(Math.toRadians(ClawUtils.encoderUnitsToDegrees(m_armMotorLeft.getSelectedSensorPosition(), Constants.Clawstants.armGearRatio))));
+            ControlMode.MotionMagic,
+            armAngleInEncoderUnits,
+            DemandType.ArbitraryFeedForward,
+            Clawstants.armFeedForward * java.lang.Math
+                .cos(Math.toRadians(ClawUtils.encoderUnitsToDegrees(m_armMotorLeft.getSelectedSensorPosition(), Constants.Clawstants.armGearRatio))));
 
     }
 
     public void zeroEncoder() {
-        m_armMotorLeft.setSelectedSensorPosition(0);
-        // m_armMotorRight.setSelectedSensorPosition(0);
-    
+        m_armMotorLeft.setSelectedSensorPosition(0);    
       }
 
     public void drive(double percent){

@@ -5,14 +5,8 @@
 package frc.robot.commands;
 
 import frc.robot.Constants;
-import frc.robot.Constants.VisionConstants;
-import frc.robot.subsystems.Buttons;
 import frc.robot.subsystems.LimelightSubsystem;
 import frc.robot.subsystems.Swerve;
-import frc.robot.subsystems.VisionSubsystem;
-
-import org.photonvision.targeting.PhotonPipelineResult;
-
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
@@ -20,7 +14,6 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class CargoPlacementCommand extends CommandBase {
   private final LimelightSubsystem m_limelightSubsystem;
-  private final Buttons m_Buttons;
   private final String m_buttonPressed;
   private Swerve m_driveSubsystem;
 
@@ -39,11 +32,10 @@ public class CargoPlacementCommand extends CommandBase {
   PIDController turnController = new PIDController(ANGULAR_P, 0, ANGULAR_D);
 
   /** Creates a new CargoPlacementCommand. */
-  public CargoPlacementCommand(Swerve driveSubsystem, LimelightSubsystem limelightSubsystem, Buttons buttons,
+  public CargoPlacementCommand(Swerve driveSubsystem, LimelightSubsystem limelightSubsystem,
       String buttonPressed) {
     // Use addRequirements() here to declare subsystem dependencies.
     m_limelightSubsystem = limelightSubsystem;
-    m_Buttons = buttons;
     m_buttonPressed = buttonPressed;
     m_driveSubsystem = driveSubsystem;
   }

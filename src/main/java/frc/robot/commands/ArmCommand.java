@@ -10,7 +10,6 @@ import frc.robot.subsystems.theCLAAAWWW;
 public class ArmCommand extends CommandBase {
   private theCLAAAWWW clawSubsystem;
   private double targetAngle;
-  private double initialAngle;
   private boolean byeFelicia = false;
   
   /** Creates a new ArmCommand. */
@@ -24,23 +23,12 @@ public class ArmCommand extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    initialAngle = clawSubsystem.getArmAngle();
     clawSubsystem.setArmAngle(targetAngle);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    // if (initialAngle < targetAngle){
-    //   if(clawSubsystem.getArmAngle() > targetAngle - 1){
-    //     byeFelicia = !byeFelicia;
-    //   }
-    // }else{
-    //   if(clawSubsystem.getArmAngle() < targetAngle + 1){
-    //     byeFelicia = !byeFelicia;
-    //   }
-
-    // }
     if(Math.abs(clawSubsystem.getArmAngle() - targetAngle) < 2){
       byeFelicia = !byeFelicia;
     }

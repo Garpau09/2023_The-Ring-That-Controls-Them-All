@@ -22,7 +22,6 @@ public class ClawCommand extends SequentialCommandGroup {
     double targetWristAngle;
     double targetArmAngle;
 
-    String targetStateString = targetState.name();
 
     if (targetState == ClawState.LOW){
       targetWristAngle = Clawstants.wristLow;

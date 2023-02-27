@@ -1,6 +1,5 @@
 package frc.robot;
 
-import javax.print.DocFlavor.STRING;
 
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
@@ -11,15 +10,11 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
-import frc.robot.autos.*;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.theCLAAAWWW.ClawState;
@@ -37,7 +32,6 @@ public class RobotContainer {
     /* Controllers */
     private final Joystick driver = new Joystick(0);
     // private final Joystick operator = new Joystick(2);
-    private final Buttons m_stupidButtons = new Buttons();
     private final XboxController m_Operator = new XboxController(1);
 
     /* Drive Controls */
@@ -46,14 +40,14 @@ public class RobotContainer {
     private final int rotationAxis = XboxController.Axis.kRightX.value;
 
     /* Driver Buttons */
-    private final JoystickButton zeroGyro = new JoystickButton(driver, XboxController.Button.kBack.value);
-    private final JoystickButton robotCentric = new JoystickButton(driver, XboxController.Button.kLeftBumper.value);
-    private final JoystickButton clawToggle = new JoystickButton(driver, XboxController.Button.kRightBumper.value);
-    private final JoystickButton armUp = new JoystickButton(driver, XboxController.Button.kB.value);
-    private final JoystickButton armDown = new JoystickButton(driver, XboxController.Button.kA.value);
-    private final JoystickButton armOffset = new JoystickButton(driver, XboxController.Button.kStart.value);
-    private final JoystickButton wristLeft = new JoystickButton(driver, XboxController.Button.kX.value);
-    private final JoystickButton wristRight = new JoystickButton(driver, XboxController.Button.kY.value);
+    private final JoystickButton kBack = new JoystickButton(driver, XboxController.Button.kBack.value);
+    private final JoystickButton kLeftBumper = new JoystickButton(driver, XboxController.Button.kLeftBumper.value);
+    // private final JoystickButton kRightBumper = new JoystickButton(driver, XboxController.Button.kRightBumper.value);
+    // private final JoystickButton kB = new JoystickButton(driver, XboxController.Button.kB.value);
+    // private final JoystickButton kA = new JoystickButton(driver, XboxController.Button.kA.value);
+    // private final JoystickButton kStart = new JoystickButton(driver, XboxController.Button.kStart.value);
+    // private final JoystickButton kX = new JoystickButton(driver, XboxController.Button.kX.value);
+    // private final JoystickButton kY = new JoystickButton(driver, XboxController.Button.kY.value);
 
     private final SendableChooser<PathPlannerTrajectory> autoChooser = new SendableChooser<>();
 
@@ -65,26 +59,12 @@ public class RobotContainer {
     private final JoystickButton rightBumper = new JoystickButton(m_Operator, XboxController.Button.kRightBumper.value);
     private final JoystickButton leftBumper = new JoystickButton(m_Operator, XboxController.Button.kLeftBumper.value);
 
- //   private final JoystickButton nodeOne = new JoystickButton(operator, 1);
-   // private final JoystickButton nodeTwo = new JoystickButton(operator, 2);
-    //   private final JoystickButton wristUpButton = new JoystickButton(operator, 1);
-    //   private final JoystickButton wristDownButton = new JoystickButton(operator, 2);
-    //   private final JoystickButton armUpButton = new JoystickButton(operator, 4);
-    //   private final JoystickButton armDownButton = new JoystickButton(operator, 5);
-    //   private final JoystickButton gripperCloseCone = new JoystickButton(operator, 0);
-    //   private final JoystickButton gripperCloseCube = new JoystickButton(operator, 0);
-    //   private final JoystickButton gripperOpen = new JoystickButton(operator, 0);
-    //   private final JoystickButton EMERGENCYSTOP = new JoystickButton(operator, 0);
-
-
 
 
     /* Subsystems */
     private final Swerve s_Swerve = new Swerve();
-    // private final PnuematicSubsystem s_PneumaticsHub = new PnuematicSubsystem();
     private final theCLAAAWWW s_Claaawww = new theCLAAAWWW();
     private final GripperSubsystem s_GripperSubsystem = new GripperSubsystem();
-    private final Wrist s_wrist = Wrist.getInstance();
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -99,21 +79,13 @@ public class RobotContainer {
                         () -> Math.pow(-driver.getRawAxis(translationAxis), 3),
                         () -> Math.pow(-driver.getRawAxis(strafeAxis), 3),
                         () -> -driver.getRawAxis(rotationAxis),
-                        () -> robotCentric.getAsBoolean()));
+                        () -> kLeftBumper.getAsBoolean()));
 
         s_GripperSubsystem.setDefaultCommand(
                 new RunCommand(
                         () -> s_GripperSubsystem
                                 .driveGripper(m_Operator.getRightTriggerAxis() - m_Operator.getLeftTriggerAxis()),
                         s_GripperSubsystem));
-
-        // s_wrist.setDefaultCommand(
-        //         new RunCommand(
-        //                 () -> s_wrist.driveWrist(m_Operator.getLeftY()),
-        //                 s_wrist)
-        // );
-
-        //s_Claaawww.setDefaultCommand(new RunCommand(() -> s_Claaawww.drive(-m_Operator.getRightY(), m_Operator.getLeftY()), s_Claaawww));
 
         PathPlannerTrajectory thingTraj = PathPlanner.loadPath("thing", new PathConstraints(3, 5));
 
@@ -133,12 +105,6 @@ public class RobotContainer {
      * it to a {@link
      * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
      */
-    private static boolean[] buttonStates = {
-        false,
-        false,
-        false,
-        false
-    };
 
     public void stopMotors(){
         s_Claaawww.drive(0, 0);
@@ -146,7 +112,7 @@ public class RobotContainer {
 
     private void configureButtonBindings() {
         /* Driver Buttons */
-        zeroGyro.onTrue(new InstantCommand(() -> s_Swerve.zeroGyro()));
+        kBack.onTrue(new InstantCommand(() -> s_Swerve.zeroGyro()));
         
         lowButton.onTrue(new ClawCommand(s_Claaawww, ClawState.LOW));
         highButton.onTrue(new ClawCommand(s_Claaawww, ClawState.HIGH));

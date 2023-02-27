@@ -6,9 +6,7 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.sensors.SensorInitializationStrategy;
-
 import edu.wpi.first.wpilibj.motorcontrol.PWMVictorSPX;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Clawstants;
@@ -32,10 +30,10 @@ public void driveGripper(double speed){
   //max and min position.  Zero is set to where the gripper CANNOT
   //close anymore.  Max is set to 330 so it does not go past 360 which
   //loops back around to zero and breaks the follow logic
-  double maxSpeed = 1;
+  //double maxSpeed = 1;
   double maxClosed = 20;
   double maxOpen = 320;
-  double position = gripperAbsolute.getAbsolutePosition();
+  //double position = gripperAbsolute.getAbsolutePosition();
   boolean isMaxClosed = gripperAbsolute.getAbsolutePosition() <= maxClosed;
   boolean isMaxOpen = gripperAbsolute.getAbsolutePosition() >= maxOpen;
   boolean gripperClosing = speed > 0;

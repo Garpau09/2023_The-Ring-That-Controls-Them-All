@@ -1,26 +1,20 @@
 package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.AbsoluteSensorRange;
 import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.sensors.SensorInitializationStrategy;
-
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.util.ClawUtils;
 import frc.robot.Constants.Clawstants;
 
 public class Wrist {
     private WPI_TalonFX m_wristMotor;
     private double wristAngleInEncoderUnits = 0;
-    private double wristAngleInDegrees = 0;
     private CANCoder wristAbsolute;
     private static Wrist singleton;
-
-
 
     private Wrist() {
         m_wristMotor = new WPI_TalonFX(Clawstants.ClawMotorWristID);
@@ -65,14 +59,14 @@ public class Wrist {
         //max and min position.  Zero is set to where the gripper CANNOT
         //close anymore.  Max is set to 330 so it does not go past 360 which
         //loops back around to zero and breaks the follow logic
-        double maxSpeed = .5;
-        double maxClosed = 10;
-        double maxOpen = 350;
-        double position = wristAbsolute.getAbsolutePosition();
-        boolean isMaxClosed = position <= maxClosed;
-        boolean isMaxOpen = position >= maxOpen;
-        boolean gripperClosing = speed > 0;
-        boolean gripperOpening = speed < 0;
+        // double maxSpeed = .5;
+        // double maxClosed = 10;
+        // double maxOpen = 350;
+        // double position = wristAbsolute.getAbsolutePosition();
+        // boolean isMaxClosed = position <= maxClosed;
+        // boolean isMaxOpen = position >= maxOpen;
+        // boolean gripperClosing = speed > 0;
+        // boolean gripperOpening = speed < 0;
       
         //  if(isMaxClosed && gripperClosing){
         //   m_wristMotor.set(0);
