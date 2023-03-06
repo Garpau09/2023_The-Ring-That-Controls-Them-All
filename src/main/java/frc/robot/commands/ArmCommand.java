@@ -5,45 +5,38 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.theCLAAAWWW;
+import frc.robot.Constants.ClawConstants.ClawPoses;
+import frc.robot.subsystems.ClawSubsystem;
 
 public class ArmCommand extends CommandBase {
-  private theCLAAAWWW clawSubsystem;
-  private double targetAngle;
-  private boolean byeFelicia = false;
+  private ClawSubsystem clawSubsystem;
+  private ClawPoses clawPose;
   
   /** Creates a new ArmCommand. */
-  public ArmCommand(theCLAAAWWW clawSubsystem, double angle) {
+  public ArmCommand(ClawSubsystem clawSubsystem, ClawPoses clawPose) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.clawSubsystem = clawSubsystem;
-    targetAngle = angle;
+    this.clawPose = clawPose;
     addRequirements(clawSubsystem);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    clawSubsystem.setArmAngle(targetAngle);
+    clawSubsystem.setArmState(clawPose);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {
-    if(Math.abs(clawSubsystem.getArmAngle() - targetAngle) < 2){
-      byeFelicia = !byeFelicia;
-    }
-  }
+  public void execute() {}
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {
-    byeFelicia = !byeFelicia;
-    clawSubsystem.setArmAngle(targetAngle);
-  }
+  public void end(boolean interrupted) {}
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return byeFelicia;
+    return clawSubsystem.getAtArmTarget(8);
   }
 }

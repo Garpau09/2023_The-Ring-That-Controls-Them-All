@@ -4,105 +4,98 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import frc.robot.Constants.Clawstants;
-import frc.robot.subsystems.theCLAAAWWW;
-import frc.robot.subsystems.theCLAAAWWW.ClawState;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
+import frc.robot.Constants.ClawConstants.ClawPoses;
+import frc.robot.subsystems.ClawSubsystem;
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class ClawCommand extends SequentialCommandGroup {
   /** Creates a new ClawCommand. */
-  public ClawCommand(theCLAAAWWW clawSubsystem, ClawState targetState) {
+  public ClawCommand(ClawSubsystem clawSubsystem, ClawPoses targetPose) {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
-    double targetWristAngle;
-    double targetArmAngle;
 
-
-    if (targetState == ClawState.LOW){
-      targetWristAngle = Clawstants.wristLow;
-      targetArmAngle = Clawstants.armLow;
-    } else if (targetState == ClawState.MEDIUM){
-      targetWristAngle = Clawstants.wristMedium;
-      targetArmAngle = Clawstants.armMedium;
-    } else if (targetState == ClawState.HIGH){
-      targetWristAngle = Clawstants.wristHigh;
-      targetArmAngle = Clawstants.armHigh;
-    } else if (targetState == ClawState.TRANSPORT){
-      targetWristAngle = Clawstants.wristTransport;
-      targetArmAngle = Clawstants.armTransport;
-    } else{
-      targetWristAngle = Clawstants.wristLoading;
-      targetArmAngle = Clawstants.armLoading;
-    }
+    ClawPoses currentPose = clawSubsystem.getClawState();
     
-    // addCommands(
-    //   new PrintCommand("RUNNING ONLY OPTION"),
-    //   new InstantCommand(() -> clawSubsystem.syncEncoders()),
-    //   new InstantCommand(()-> clawSubsystem.setState(targetState)),
-    //   new PrintCommand("TWERKING WRIST"),
-    //   new WristCommand(clawSubsystem, clawSubsystem.getWristAngle() + 10),
-    //   new PrintCommand("ARM TO TRANSITION"),
-    //   new ArmCommand(clawSubsystem, Clawstants.armMedium), 
-    //   new PrintCommand("Moving Wrist"),
-    //   new WristCommand(clawSubsystem, Clawstants.wristLoading),
-    //   new PrintCommand("Moving Arm"),
-    //   new ArmCommand(clawSubsystem, Clawstants.armLoading),
-    //   new PrintCommand("Finished Sequence"));
-
+    //TODO: WaitCommands() are added here for safety.  Remove if (doubtfully) it works
 
     if(
-      (clawSubsystem.getState() == ClawState.LOW || clawSubsystem.getState() == ClawState.TRANSPORT) 
+      (currentPose == ClawPoses.LOW_SCORE || currentPose == ClawPoses.TRANSPORT) 
       && 
-      (targetState == ClawState.LOADING || targetState == ClawState.TRANSPORT)){
+      (targetPose == ClawPoses.LOADING || targetPose == ClawPoses.TRANSPORT)){
       addCommands(
-        new PrintCommand("RUNNING OPTION 1"),
-        new InstantCommand(() -> clawSubsystem.syncEncoders()),
-        new PrintCommand("Moving Arm"),
-        new ArmCommand(clawSubsystem, Clawstants.armTransition), 
-        new PrintCommand("Moving Wrist"),
-        new WristCommand(clawSubsystem, Clawstants.wristLoading),
-        new PrintCommand("Moving Arm"),
-        new ArmCommand(clawSubsystem, Clawstants.armLoading),
-        new PrintCommand("Finished Sequence"));
+        //Arm out -> rotate wrist -> arm in
+        new ClawDashboardCommand("Moving to TRANSITION"),
+        new PrintCommand("Current Pose: " + currentPose.toString()),
+        new PrintCommand("Target Pose: " + targetPose.toString()),
+        new PrintCommand("RUNNING OPTION 1 \nWaiting 20s"),
+        new WaitCommand(20),
+        new PrintCommand("Moving Arm to TRANSITION"),
+          new ArmCommand(clawSubsystem, ClawPoses.TRANSITION), 
+        new ClawDashboardCommand("Moving to " + targetPose.toString()),
+        new PrintCommand("Moving Wrist to " + targetPose.toString()),
+          new WristCommand(clawSubsystem, targetPose),
+        new PrintCommand("Moving Arm to " + targetPose.toString()),
+          new ArmCommand(clawSubsystem, targetPose),
+        new PrintCommand("Finished Sequence"),
+        new ClawDashboardCommand(targetPose.toString()));
     }
     else if(
-      (clawSubsystem.getState() == ClawState.LOADING) && (targetState == ClawState.LOW || targetState == ClawState.TRANSPORT)){
+      (currentPose == ClawPoses.LOADING) && (targetPose == ClawPoses.LOW_SCORE || targetPose == ClawPoses.TRANSPORT)){
       addCommands(
-        new PrintCommand("RUNNING OPTION 2"),
-        new InstantCommand(() -> clawSubsystem.syncEncoders()),
-        new WristCommand(clawSubsystem, Clawstants.wristGrabbed),
-        new ArmCommand(clawSubsystem, Clawstants.armTransition), 
-        new WristCommand(clawSubsystem, targetWristAngle),
-        new ArmCommand(clawSubsystem, targetArmAngle));
+        // Wrist grab -> arm out -> rotate wrist -> arm in
+        new ClawDashboardCommand("Moving to " + targetPose.toString()),
+        new PrintCommand("Current Pose: " + currentPose.toString()),
+        new PrintCommand("Target Pose: " + targetPose.toString()),
+        new PrintCommand("RUNNING OPTION 2 \nWaiting 20s"),
+        new WaitCommand(20),
+        new PrintCommand("Moving Wrist to GRABBING"),
+          new WristCommand(clawSubsystem, ClawPoses.GRABBING),
+        new PrintCommand("Moving Arm to TRANSITION"),
+          new ArmCommand(clawSubsystem, ClawPoses.TRANSITION), 
+        new PrintCommand("Moving Wrist to " + targetPose.toString()),
+          new WristCommand(clawSubsystem, targetPose),
+        new PrintCommand("Moving Arm to " + targetPose.toString()),
+          new ArmCommand(clawSubsystem, targetPose),
+        new PrintCommand("Finished Sequence"),
+        new ClawDashboardCommand(targetPose.toString()));
     }
-    else if(clawSubsystem.getState() == ClawState.LOADING){
+    else if(currentPose == ClawPoses.LOADING){
       addCommands(
-        new PrintCommand("RUNNING OPTION 3"),
-        new PrintCommand("clawState: " + clawSubsystem.clawState.name()),
-        new PrintCommand("targetState: " + targetState),
-        new InstantCommand(() -> clawSubsystem.syncEncoders()),
-        new WristCommand(clawSubsystem, Clawstants.wristGrabbed),
-        new ArmCommand(clawSubsystem, targetArmAngle), 
-        new WristCommand(clawSubsystem, targetWristAngle));
-    } else{
-      addCommands(
-        new PrintCommand("RUNNING OPTION 4"),
-        new InstantCommand(() -> clawSubsystem.syncEncoders()),
-        new ArmCommand(clawSubsystem, targetArmAngle),
-        new WristCommand(clawSubsystem, targetWristAngle));
-    }
+        //
+        new ClawDashboardCommand("Moving to " + targetPose.toString()),
+        new PrintCommand("Current Pose: " + currentPose.toString()),
+        new PrintCommand("Target Pose: " + targetPose.toString()),
+        new PrintCommand("RUNNING OPTION 3 \nWaiting 20s"),
+        new WaitCommand(20),
+        new PrintCommand("Moving Wrist to GRABBING"),
+          new WristCommand(clawSubsystem, ClawPoses.GRABBING),
+        new PrintCommand("Moving Arm to " + targetPose.toString()),
+          new ArmCommand(clawSubsystem, targetPose), 
+        new PrintCommand("Moving Wrist to " + targetPose.toString()),
+          new WristCommand(clawSubsystem, targetPose),
+        new PrintCommand("Finished Sequence"),
+        new ClawDashboardCommand(targetPose.toString()));
 
-    
-    
-  // }
-  
-  // public ClawCommand(theCLAAAWWW clawSubsystem, double angle){
-  //   addCommands(new ArmCommand(clawSubsystem, angle));
-  // }
+    } 
+    else {
+      addCommands(
+        new ClawDashboardCommand("Moving to " + targetPose.toString()),
+        new PrintCommand("Current Pose: " + currentPose.toString()),
+        new PrintCommand("Target Pose: " + targetPose.toString()),
+        new PrintCommand("RUNNING OPTION 4 \nWaiting 20s"),
+        new WaitCommand(20),
+        new PrintCommand("Moving Arm to " + targetPose.toString()),
+          new ArmCommand(clawSubsystem, targetPose),
+        new PrintCommand("Moving Wrist to " + targetPose.toString()),
+          new WristCommand(clawSubsystem, targetPose),
+        new PrintCommand("Finished Sequence"),
+        new ClawDashboardCommand(targetPose.toString()));
+
+    }
   }
 }

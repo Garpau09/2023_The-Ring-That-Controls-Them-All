@@ -9,11 +9,11 @@ import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 import edu.wpi.first.wpilibj.motorcontrol.PWMVictorSPX;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.Clawstants;
+import frc.robot.Constants.ClawConstants;
 
 public class GripperSubsystem extends SubsystemBase {
   /** Creates a new GripperSubsystem. */
-  CANCoder gripperAbsolute = new CANCoder(Clawstants.ClawEncoder);
+  CANCoder gripperAbsolute = new CANCoder(ClawConstants.GripperEncoder);
 
   public GripperSubsystem() {
     gripperAbsolute.configFactoryDefault();

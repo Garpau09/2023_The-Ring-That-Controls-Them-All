@@ -1,23 +1,15 @@
 package frc.robot;
 
-
-import com.pathplanner.lib.PathConstraints;
-import com.pathplanner.lib.PathPlanner;
-import com.pathplanner.lib.PathPlannerTrajectory;
-
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-
+import frc.robot.Constants.ClawConstants.ClawPoses;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
-import frc.robot.subsystems.theCLAAAWWW.ClawState;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -31,7 +23,6 @@ import frc.robot.subsystems.theCLAAAWWW.ClawState;
 public class RobotContainer {
     /* Controllers */
     private final Joystick driver = new Joystick(0);
-    // private final Joystick operator = new Joystick(2);
     private final XboxController m_Operator = new XboxController(1);
 
     /* Drive Controls */
@@ -40,8 +31,8 @@ public class RobotContainer {
     private final int rotationAxis = XboxController.Axis.kRightX.value;
 
     /* Driver Buttons */
-    private final JoystickButton kBack = new JoystickButton(driver, XboxController.Button.kBack.value);
-    private final JoystickButton kLeftBumper = new JoystickButton(driver, XboxController.Button.kLeftBumper.value);
+    private final JoystickButton driver_Back = new JoystickButton(driver, XboxController.Button.kBack.value);
+    private final JoystickButton driver_leftBumper = new JoystickButton(driver, XboxController.Button.kLeftBumper.value);
     // private final JoystickButton kRightBumper = new JoystickButton(driver, XboxController.Button.kRightBumper.value);
     // private final JoystickButton kB = new JoystickButton(driver, XboxController.Button.kB.value);
     // private final JoystickButton kA = new JoystickButton(driver, XboxController.Button.kA.value);
@@ -49,48 +40,38 @@ public class RobotContainer {
     // private final JoystickButton kX = new JoystickButton(driver, XboxController.Button.kX.value);
     // private final JoystickButton kY = new JoystickButton(driver, XboxController.Button.kY.value);
 
-    private final SendableChooser<PathPlannerTrajectory> autoChooser = new SendableChooser<>();
-
     /* operator Buttons */
-    private final JoystickButton loadingButton = new JoystickButton(m_Operator, XboxController.Button.kX.value);
-    private final JoystickButton lowButton = new JoystickButton(m_Operator, XboxController.Button.kA.value);
-    private final JoystickButton mediumButton = new JoystickButton(m_Operator, XboxController.Button.kB.value);
-    private final JoystickButton highButton = new JoystickButton(m_Operator, XboxController.Button.kY.value);
-    private final JoystickButton rightBumper = new JoystickButton(m_Operator, XboxController.Button.kRightBumper.value);
-    private final JoystickButton leftBumper = new JoystickButton(m_Operator, XboxController.Button.kLeftBumper.value);
-
-
+    private final JoystickButton operator_X = new JoystickButton(m_Operator, XboxController.Button.kX.value);
+    private final JoystickButton operator_A = new JoystickButton(m_Operator, XboxController.Button.kA.value);
+    private final JoystickButton operator_B = new JoystickButton(m_Operator, XboxController.Button.kB.value);
+    private final JoystickButton operator_Y = new JoystickButton(m_Operator, XboxController.Button.kY.value);
+    //private final JoystickButton operator_rightBumper = new JoystickButton(m_Operator, XboxController.Button.kRightBumper.value);
+    private final JoystickButton operator_leftBumper = new JoystickButton(m_Operator, XboxController.Button.kLeftBumper.value);
 
     /* Subsystems */
-    private final Swerve s_Swerve = new Swerve();
-    private final theCLAAAWWW s_Claaawww = new theCLAAAWWW();
-    private final GripperSubsystem s_GripperSubsystem = new GripperSubsystem();
+    private final Swerve mSwerve = new Swerve();
+    private final ClawSubsystem mClawSubsystem = new ClawSubsystem();
+    private final GripperSubsystem mGripperSubsystem = new GripperSubsystem();
 
     /**
      * The container for the robot. Contains subsystems, OI devices, and commands.
      */
     public RobotContainer() {
 
-        Shuffleboard.getTab("Autonomous").add(autoChooser);
 
-        s_Swerve.setDefaultCommand(
+        mSwerve.setDefaultCommand(
                 new TeleopSwerve(
-                        s_Swerve,
+                        mSwerve,
                         () -> Math.pow(-driver.getRawAxis(translationAxis), 3),
                         () -> Math.pow(-driver.getRawAxis(strafeAxis), 3),
                         () -> -driver.getRawAxis(rotationAxis),
-                        () -> kLeftBumper.getAsBoolean()));
+                        () -> driver_leftBumper.getAsBoolean()));
 
-        s_GripperSubsystem.setDefaultCommand(
+        mGripperSubsystem.setDefaultCommand(
                 new RunCommand(
-                        () -> s_GripperSubsystem
+                        () -> mGripperSubsystem
                                 .driveGripper(m_Operator.getRightTriggerAxis() - m_Operator.getLeftTriggerAxis()),
-                        s_GripperSubsystem));
-
-        PathPlannerTrajectory thingTraj = PathPlanner.loadPath("thing", new PathConstraints(3, 5));
-
-        autoChooser.setDefaultOption("Thing", thingTraj); //TODO: Change default auto
-        autoChooser.addOption("Thing", thingTraj);
+                        mGripperSubsystem));
 
         // Configure the button bindings
 
@@ -106,69 +87,15 @@ public class RobotContainer {
      * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
      */
 
-    public void stopMotors(){
-        s_Claaawww.drive(0, 0);
-    }
-
     private void configureButtonBindings() {
         /* Driver Buttons */
-        kBack.onTrue(new InstantCommand(() -> s_Swerve.zeroGyro()));
+        driver_Back.onTrue(new InstantCommand(() -> mSwerve.zeroGyro()));
         
-        lowButton.onTrue(new ClawCommand(s_Claaawww, ClawState.LOW));
-        highButton.onTrue(new ClawCommand(s_Claaawww, ClawState.HIGH));
-        loadingButton.onTrue(new ClawCommand(s_Claaawww, ClawState.LOADING));
-        mediumButton.onTrue(new ClawCommand(s_Claaawww, ClawState.MEDIUM));
-        leftBumper.onTrue(new ClawCommand(s_Claaawww, ClawState.TRANSPORT));
-
-        //s_Claaawww.setState(ClawState.LOADING);
-
-        rightBumper.whileTrue(new RunCommand(() -> s_Claaawww.drive(-m_Operator.getRightY(), m_Operator.getLeftY()), s_Claaawww));
-        rightBumper.onFalse(new RunCommand(() -> s_Claaawww.drive(0, 0), s_Claaawww));
-        //Set arm speed to FF*cos(getArmAngle)
-        //e.g. .05*sin(0) = 0
-        //e.g. .05sin(90) = .05
-
-        // clawToggle.onTrue(new InstantCommand(() ->
-        // s_PneumaticsHub.toggleClawSolenoid()));
-
-        // when up button is pressed, start moving claw up
-        // when down button is pressed, start moving the claw down
-        // armUp.onTrue(new InstantCommand(() -> s_Claaawww.armUp()));
-        // armDown.onTrue(new InstantCommand(() -> s_Claaawww.armDown()));
-        // wristLeft.onTrue(new InstantCommand(() -> s_Claaawww.wristLeft()));
-        // wristRight.onTrue(new InstantCommand(() -> s_Claaawww.wristRight()));
-
-        // when up or down button is unpressed, stop moving the claw
-        // when stop button is pressed, stop moving the claw
-        // armUp.onFalse(new InstantCommand(() -> s_Claaawww.armStop()));
-        // armDown.onFalse(new InstantCommand(() -> s_Claaawww.armStop()));
-        // armOffset.onTrue(new InstantCommand(() -> s_Claaawww.setArmOffsets()));
-        // wristLeft.onFalse(new InstantCommand(() -> s_Claaawww.wristStop()));
-        // wristRight.onFalse(new InstantCommand(() -> s_Claaawww.wristStop()));
-
-        /* operator Buttons */
-
-        // nodeOne.onTrue(new InstantCommand(() ->
-        // s_Claaawww.setClawstate(ClawState.LOADING)));
-        // nodeOne.onTrue(new InstantCommand(() -> SmartDashboard.putBoolean("nodeOne",
-        // true)));
-        // nodeOne.onFalse(new InstantCommand(() -> SmartDashboard.putBoolean("nodeOne",
-        // false)));
-
-        // wristUpButton.onTrue(new InstantCommand(() -> s_wrist.driveWrist(0.1)));
-        // wristUpButton.onFalse(new InstantCommand(() -> s_wrist.driveWrist(0)));
-
-        // wristDownButton.onTrue(new InstantCommand(() -> s_wrist.driveWrist(-0.1)));
-        // wristDownButton.onFalse(new InstantCommand(() -> s_wrist.driveWrist(0)));
-
-        // armUpButton.onTrue(new InstantCommand(() -> s_Claaawww.drive(0.1)));
-        // armUpButton.onFalse(new InstantCommand(() -> s_Claaawww.drive(0)));
-
-        // armDownButton.onTrue(new InstantCommand(() -> s_Claaawww.drive(-0.1)));
-        // armDownButton.onFalse(new InstantCommand(() -> s_Claaawww.drive(0)));
-
-        
-
+        operator_A.onTrue(new ClawCommand(mClawSubsystem, ClawPoses.LOW_SCORE));
+        operator_Y.onTrue(new ClawCommand(mClawSubsystem, ClawPoses.HIGH_SCORE));
+        operator_X.onTrue(new ClawCommand(mClawSubsystem, ClawPoses.LOADING));
+        operator_B.onTrue(new ClawCommand(mClawSubsystem, ClawPoses.MID_SCORE));
+        operator_leftBumper.onTrue(new ClawCommand(mClawSubsystem, ClawPoses.TRANSPORT));
     }
 
     /**
@@ -179,6 +106,6 @@ public class RobotContainer {
      */
     public Command getAutonomousCommand() {
         // An ExampleCommand will run in autonomous
-        return  s_Swerve.followTrajectoryCommand(autoChooser.getSelected(), true);
+        return  null;
     }
 }

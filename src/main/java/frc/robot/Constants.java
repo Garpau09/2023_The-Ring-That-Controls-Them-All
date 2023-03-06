@@ -1,5 +1,7 @@
 package frc.robot;
 
+import java.util.HashMap;
+
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -18,12 +20,12 @@ public final class Constants {
         public static final int pigeonID = 27;
         public static final boolean invertGyro = false; // Always ensure Gyro is CCW+ CW-
 
-        public static final COTSFalconSwerveConstants chosenModule =  //TODO: This must be tuned to specific robot - DONE
+        public static final COTSFalconSwerveConstants chosenModule =  
             COTSFalconSwerveConstants.SDSMK4(COTSFalconSwerveConstants.driveGearRatios.SDSMK4_L3);
 
         /* Drivetrain Constants */
-        public static final double trackWidth = Units.inchesToMeters(23); //TODO: This must be tuned to specific robot - DONE
-        public static final double wheelBase = Units.inchesToMeters(23.5); //TODO: This must be tuned to specific robot - DONE
+        public static final double trackWidth = Units.inchesToMeters(23); 
+        public static final double wheelBase = Units.inchesToMeters(23.5); 
         public static final double wheelCircumference = chosenModule.wheelCircumference;
 
         /* Swerve Kinematics 
@@ -68,7 +70,7 @@ public final class Constants {
         public static final double angleKF = chosenModule.angleKF;
 
         /* Drive Motor PID Values */
-        public static final double driveKP = 0.05; //TODO: This must be tuned to specific robot
+        public static final double driveKP = 0.05; 
         public static final double driveKI = 0.0;
         public static final double driveKD = 0.0;
         public static final double driveKF = 0.0;
@@ -76,15 +78,15 @@ public final class Constants {
         
         /* Drive Motor Characterization Values 
          * Divide SYSID values by 12 to convert from volts to percent output for CTRE */
-        public static final double driveKS = (0.32 / 12); //TODO: This must be tuned to specific robot
+        public static final double driveKS = (0.32 / 12); 
         public static final double driveKV = (1.51 / 12);
         public static final double driveKA = (0.27 / 12);
 
         /* Swerve Profiling Values */
         /** Meters per Second */
-        public static final double maxSpeed = 3; //TODO: This must be tuned to specific robot
+        public static final double maxSpeed = 3; 
         /** Radians per Second */
-        public static final double maxAngularVelocity = 3.0; //TODO: This must be tuned to specific robot
+        public static final double maxAngularVelocity = 3.0; 
 
         /* Neutral Modes */
         public static final NeutralMode angleNeutralMode = NeutralMode.Coast;
@@ -92,7 +94,7 @@ public final class Constants {
 
         /* Module Specific Constants */
         /* Front Left Module - Module 0 */
-        public static final class FrontLeft { //TODO: This must be tuned to specific robot
+        public static final class FrontLeft { 
             public static final int driveMotorID = 2;
             public static final int angleMotorID = 3;
             public static final int canCoderID = 10;
@@ -102,7 +104,7 @@ public final class Constants {
         }
 
         /* Front Right Module - Module 1 */
-        public static final class FrontRight { //TODO: This must be tuned to specific robot
+        public static final class FrontRight { 
             public static final int driveMotorID = 6;
             public static final int angleMotorID = 7;
             public static final int canCoderID = 12;
@@ -112,7 +114,7 @@ public final class Constants {
         }
         
         /* Back Left Module - Module 2 */
-        public static final class RearLeft { //TODO: This must be tuned to specific robot
+        public static final class RearLeft { 
             public static final int driveMotorID = 8;
             public static final int angleMotorID = 1;
             public static final int canCoderID = 9;
@@ -122,7 +124,7 @@ public final class Constants {
         }
 
         /* Back Right Module - Module 3 */
-        public static final class RearRight { //TODO: This must be tuned to specific robot
+        public static final class RearRight { 
             public static final int driveMotorID = 4;
             public static final int angleMotorID = 5;
             public static final int canCoderID = 11;
@@ -132,7 +134,7 @@ public final class Constants {
         }
     }
 
-    public static final class AutoConstants { //TODO: The below constants are used in the example auto, and must be tuned to specific robot
+    public static final class AutoConstants { 
         public static final double kMaxSpeedMetersPerSecond = 3;
         public static final double kMaxAccelerationMetersPerSecondSquared = 3;
         public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
@@ -174,31 +176,45 @@ public final class Constants {
         };
         
     }
-
-    public static final class PneumaticsConstants { // TODO: change pnuematic ports
-        public static final int PneumaticsHubID = 20;
-        public static final int ClawSolenoidID = 0;
-    }
     
-    public static final class Clawstants { // TODO: change claw ports
-        public static final int ClawMotorWristID = 28;
-        public static final int ClawMotorLeftID = 26;
-        public static final int ClawMotorRightID = 25;
-        public static final int ClawEncoder = 29;
-        public static final int wristEncoder = 30;
-        // public static final int PotentiometerID = 0;
-        
-        public static final double armFeedForward = 0.09;
-        public static final double wristFeedForward = 0;
 
-        public static final double ClawLoadingToLowPosition = 30000; // thirty-thousand
+
+    public static final class ClawConstants{
+        public static enum ClawPoses{
+            LOADING,
+            TRANSPORT,
+            LOW_SCORE,
+            MID_SCORE,
+            HIGH_SCORE,
+            TRANSITION,
+            GRABBING
+        }
+     
+        public static final HashMap<ClawPoses, double[]> kClawStates = new HashMap<ClawPoses, double[]>(){
+            {
+            /**
+             * @param Wrist Position, Arm Position
+             */
+            put(ClawPoses.LOADING, new double[] {335, 0}); //TODO: Change these encoder values
+            put(ClawPoses.TRANSPORT, new double[] {76, 0});
+            put(ClawPoses.LOW_SCORE, new double[] {151, 11});
+            put(ClawPoses.MID_SCORE, new double[] {170, 75});
+            put(ClawPoses.HIGH_SCORE, new double[] {203, 100});
+            put(ClawPoses.TRANSITION, new double[] {0, 50}); //Transition is not used on the wrist
+            put(ClawPoses.GRABBING, new double[] {345, 0});
+            }
+        };
 
         public static final double armGearRatio = 144;
         public static final double wristGearRatio = 1;
 
-        public static final double closedCube = 0;//TODO update with correct encoder value
-        public static final double openAll = 0;
-        public static final double closedCone = 0;
+        public static final double armFeedForward = 0.09;
+
+        public static final int ClawMotorWristID = 28;
+        public static final int ClawMotorLeftID = 26;
+        public static final int ClawMotorRightID = 25;
+        public static final int GripperEncoder = 29;
+        public static final int wristEncoder = 30;
 
         public static final double wristGrabbed = 345; // Values Changed 2/26 2:53PM WAS 326
         public static final double wristLoading = 335; 
@@ -214,6 +230,5 @@ public final class Constants {
         public static final double armHigh = 100;
         public static final double armTransition = 50;
 
-        /* Arm Motor PID Values */
     }
 }
